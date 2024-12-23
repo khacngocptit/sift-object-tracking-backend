@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video and ROI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Video and ROI</h1>
+    <form id="uploadForm">
+        <label for="video">Select Video:</label><br>
+        <input type="file" id="video" name="video" accept="video/*"><br><br>
+
+        <label for="roi">Select ROI Image:</label><br>
+        <input type="file" id="roi" name="roi" accept="image/*"><br><br>
+
+        <button type="button" onclick="uploadFiles()">Upload</button>
+    </form>
+
+    <div id="response" class="response" style="display: none;"></div>
+
+    <script>
+        async function uploadFiles() {
+            const videoFile = document.getElementById("video").files[0];
+            const roiFile = document.getElementById("roi").files[0];
+            const responseDiv = document.getElementById("response");
+
+            if (!videoFile || !roiFile) {
+                responseDiv.style.display = "block";
+                responseDiv.textContent = "Please select both video and ROI files.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("video", videoFile);
+            formData.append("roi", roiFile);
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/upload", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+                responseDiv.style.display = "block";
+
+                if (response.ok) {
+                    responseDiv.style.borderColor = "#4CAF50";
+                    responseDiv.style.backgroundColor = "#e9fbe9";
+                    responseDiv.textContent = `Upload successful! Output video: ${data.output_video}`;
+                } else {
+                    responseDiv.style.borderColor = "#f44336";
+                    responseDiv.style.backgroundColor = "#fbe9e9";
+                    responseDiv.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                responseDiv.style.display = "block";
+                responseDiv.style.borderColor = "#f44336";
+                responseDiv.style.backgroundColor = "#fbe9e9";
+                responseDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

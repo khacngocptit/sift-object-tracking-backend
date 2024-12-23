@@ -6,9 +6,10 @@ __pycache__/
 venv/
 
 # Local directories
-uploads/
 processed/
 
 # System files
 .DS_Store
 Thumbs.db
+output/
+app/
